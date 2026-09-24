@@ -953,7 +953,7 @@
       </article>
 
 
-      <!-- 5. RESULTS -->
+         <!-- 5. RESULTS -->
 
       <article class="paper-card" id="results">
         <div class="paper-card-inner">
@@ -967,39 +967,64 @@
           <p>
             Both the baseline and Logistic Regression were evaluated on the
             <strong>same held-out client test set</strong>.
-            The primary metric was Precision@50 because the practical
-            decision is to identify the first 50 pages for human review.
+            The primary metric was <strong>Precision@50</strong> because the
+            practical decision is to identify the first 50 pages for human
+            review.
           </p>
+
+
+          <div class="callout info">
+
+            <strong>Evaluation context</strong>
+
+            The held-out test set contained
+            <strong>6,163 content pages</strong>.
+            Of these, <strong>3,149 pages (51.10%)</strong> had the observed
+            declining proxy label
+            <code>trend_direction == "down"</code>.
+            This is the held-out positive rate used as context for interpreting
+            the ranking result.
+
+          </div>
+
 
           <div class="result-grid">
 
             <div class="result-card">
               <div class="result-value baseline">0.66</div>
+
               <div class="result-label">
                 Visibility + CTR baseline
               </div>
+
               <div class="result-note">
                 33 of the top 50 rows matched the proxy label.
               </div>
             </div>
 
+
             <div class="result-card">
               <div class="result-value positive">1.00</div>
+
               <div class="result-label">
                 Logistic Regression
               </div>
+
               <div class="result-note">
                 50 of the top 50 rows matched the proxy label.
               </div>
             </div>
 
+
             <div class="result-card">
-              <div class="result-value">50</div>
+              <div class="result-value">51.10%</div>
+
               <div class="result-label">
-                Review slots
+                Held-out positive rate
               </div>
+
               <div class="result-note">
-                The fixed ranking capacity represented by Precision@50.
+                3,149 declining-proxy rows out of 6,163 held-out rows.
               </div>
             </div>
 
@@ -1015,7 +1040,7 @@
                 <th>Method</th>
                 <th>Precision@50</th>
                 <th>Top-50 positives</th>
-                <th>Evaluation</th>
+                <th>Evaluation set</th>
               </tr>
             </thead>
 
@@ -1072,8 +1097,8 @@
             <div class="caption">
               <strong>Figure 1.</strong>
               Precision@50 comparison generated from the committed capstone
-              metric result. Higher Precision@50 means that more of the first
-              50 ranked pages matched the observed decline proxy.
+              metric result. The metric measures how many of the first 50
+              ranked pages matched the observed decline proxy.
             </div>
 
           </div>
@@ -1082,45 +1107,110 @@
           <h3>4.2 Full held-out test performance</h3>
 
           <p>
-            On the full held-out test set of
-            <strong>6,163 rows</strong>, the classification evaluation
-            produced:
+            Precision@50 evaluates only the first 50 ranked pages. To provide
+            additional context, the full held-out test set contained
+            <strong>6,163 rows</strong>.
           </p>
+
 
           <table class="metric-table">
 
             <thead>
               <tr>
                 <th>Measure</th>
-                <th>Count</th>
+                <th>Result</th>
               </tr>
             </thead>
 
             <tbody>
 
               <tr>
-                <td>False positives</td>
-                <td><strong>800</strong></td>
+                <td>
+                  Held-out test rows
+                </td>
+
+                <td>
+                  <strong>6,163</strong>
+                </td>
               </tr>
 
               <tr>
-                <td>False negatives</td>
-                <td><strong>811</strong></td>
+                <td>
+                  Held-out declining-proxy rows
+                </td>
+
+                <td>
+                  <strong>3,149</strong>
+                </td>
               </tr>
 
               <tr>
-                <td>Total classification errors</td>
-                <td><strong>1,611</strong></td>
+                <td>
+                  Held-out positive rate
+                </td>
+
+                <td>
+                  <strong>51.10%</strong>
+                </td>
               </tr>
 
               <tr>
-                <td>Held-out rows</td>
-                <td><strong>6,163</strong></td>
+                <td>
+                  False positives
+                </td>
+
+                <td>
+                  <strong>800</strong>
+                </td>
+              </tr>
+
+              <tr>
+                <td>
+                  False negatives
+                </td>
+
+                <td>
+                  <strong>811</strong>
+                </td>
+              </tr>
+
+              <tr>
+                <td>
+                  Total classification errors
+                </td>
+
+                <td>
+                  <strong>1,611</strong>
+                </td>
+              </tr>
+
+              <tr>
+                <td>
+                  Classification error rate
+                </td>
+
+                <td>
+                  <strong>26.14%</strong>
+                </td>
               </tr>
 
             </tbody>
 
           </table>
+
+
+          <div class="callout warning">
+
+            <strong>Important metric distinction</strong>
+
+            The <strong>1.00 Precision@50</strong> result does not mean the
+            model achieved 100% overall classification accuracy.
+            The full held-out evaluation contained
+            <strong>1,611 classification errors</strong>, including
+            <strong>800 false positives</strong> and
+            <strong>811 false negatives</strong>.
+
+          </div>
 
 
           <h3>4.3 Model interpretation</h3>
@@ -1140,6 +1230,7 @@
             <li>Freshness.</li>
           </ul>
 
+
           <div class="callout warning">
 
             <strong>Interpret coefficients as associations.</strong>
@@ -1158,16 +1249,43 @@
             <strong>Do not interpret 1.00 as 100% accuracy.</strong>
 
             Logistic Regression placed 50 rows in its top-ranked 50 and all
-            50 had the proxy label <code>trend_direction == "down"</code>
+            50 had the proxy label
+            <code>trend_direction == "down"</code>
             on this particular held-out ranking.
 
             It does <strong>not</strong> mean that every test row was correctly
             classified.
 
+            The full held-out test set had a
+            <strong>26.14% classification error rate</strong>.
+
             It also does <strong>not</strong> mean that refreshing those pages
             will improve their future performance.
 
           </div>
+
+
+          <h3>4.5 Evidence-based interpretation</h3>
+
+          <p>
+            On this particular client-held-out evaluation, Logistic Regression
+            produced a measured <strong>Precision@50 of 1.00</strong>,
+            compared with <strong>0.66</strong> for the Visibility + CTR
+            baseline.
+          </p>
+
+          <p>
+            This means that all 50 pages selected at the top of the model's
+            ranking matched the observed decline proxy in this evaluation,
+            while 33 of the baseline's top 50 pages matched the same proxy.
+          </p>
+
+          <p>
+            The result supports using the model as a
+            <strong>review-prioritization signal for further testing</strong>.
+            It does not establish universal performance, causal impact,
+            automatic refresh decisions, or guaranteed future SEO improvement.
+          </p>
 
         </div>
       </article>
