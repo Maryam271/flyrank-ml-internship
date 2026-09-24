@@ -669,6 +669,15 @@
           </p>
 
           <p>
+            A false positive sends a page into the limited human review queue
+            even though it does not match the observed decline proxy, creating
+            review effort. A false negative leaves a proxy-declining page lower
+            in the queue, potentially delaying investigation. Because the
+            project is decision-support, these errors affect prioritization
+            rather than automatically changing content.
+          </p>
+
+          <p>
             The project uses a binary classification framing for an observed
             decline proxy and converts model outputs into a ranking. Because
             the operational decision is about the first pages to investigate,
@@ -851,6 +860,14 @@
           </p>
 
           <p>
+            The final candidate feature frame contained <strong>40 observable
+            features</strong>: <strong>29 numeric</strong> and
+            <strong>11 categorical</strong>. The exact feature list is defined
+            in the committed capstone notebook. Target-derived fields and
+            identifiers were excluded before modeling.
+          </p>
+
+          <p>
             Specifically excluded were:
           </p>
 
@@ -871,9 +888,9 @@
           </p>
 
           <p>
-            This establishes whether a more complex learned model provides
-            useful ranking information beyond a straightforward observable
-            signal rule.
+            This provides a transparent reference point for comparing the
+            learned ranking model against a straightforward observable-signal
+            approach.
           </p>
 
           <h3>3.4 Logistic Regression model</h3>
@@ -953,7 +970,7 @@
       </article>
 
 
-         <!-- 5. RESULTS -->
+      <!-- 5. RESULTS -->
 
       <article class="paper-card" id="results">
         <div class="paper-card-inner">
@@ -967,64 +984,39 @@
           <p>
             Both the baseline and Logistic Regression were evaluated on the
             <strong>same held-out client test set</strong>.
-            The primary metric was <strong>Precision@50</strong> because the
-            practical decision is to identify the first 50 pages for human
-            review.
+            The primary metric was Precision@50 because the practical
+            decision is to identify the first 50 pages for human review.
           </p>
-
-
-          <div class="callout info">
-
-            <strong>Evaluation context</strong>
-
-            The held-out test set contained
-            <strong>6,163 content pages</strong>.
-            Of these, <strong>3,149 pages (51.10%)</strong> had the observed
-            declining proxy label
-            <code>trend_direction == "down"</code>.
-            This is the held-out positive rate used as context for interpreting
-            the ranking result.
-
-          </div>
-
 
           <div class="result-grid">
 
             <div class="result-card">
               <div class="result-value baseline">0.66</div>
-
               <div class="result-label">
                 Visibility + CTR baseline
               </div>
-
               <div class="result-note">
                 33 of the top 50 rows matched the proxy label.
               </div>
             </div>
 
-
             <div class="result-card">
               <div class="result-value positive">1.00</div>
-
               <div class="result-label">
                 Logistic Regression
               </div>
-
               <div class="result-note">
                 50 of the top 50 rows matched the proxy label.
               </div>
             </div>
 
-
             <div class="result-card">
-              <div class="result-value">51.10%</div>
-
+              <div class="result-value">50</div>
               <div class="result-label">
-                Held-out positive rate
+                Review slots
               </div>
-
               <div class="result-note">
-                3,149 declining-proxy rows out of 6,163 held-out rows.
+                The fixed ranking capacity represented by Precision@50.
               </div>
             </div>
 
@@ -1040,7 +1032,7 @@
                 <th>Method</th>
                 <th>Precision@50</th>
                 <th>Top-50 positives</th>
-                <th>Evaluation set</th>
+                <th>Evaluation</th>
               </tr>
             </thead>
 
@@ -1090,15 +1082,15 @@
           <div class="chart-wrap">
 
             <img
-              src="paper-examples/assets/capstone_precision_at_50.png"
+              src="assets/capstone_precision_at_50.png"
               alt="Precision at 50 comparison between the Visibility and CTR baseline and Logistic Regression"
             />
 
             <div class="caption">
               <strong>Figure 1.</strong>
               Precision@50 comparison generated from the committed capstone
-              metric result. The metric measures how many of the first 50
-              ranked pages matched the observed decline proxy.
+              metric result. Higher Precision@50 means that more of the first
+              50 ranked pages matched the observed decline proxy.
             </div>
 
           </div>
@@ -1107,91 +1099,40 @@
           <h3>4.2 Full held-out test performance</h3>
 
           <p>
-            Precision@50 evaluates only the first 50 ranked pages. To provide
-            additional context, the full held-out test set contained
-            <strong>6,163 rows</strong>.
+            On the full held-out test set of
+            <strong>6,163 rows</strong>, the classification evaluation
+            produced:
           </p>
-
 
           <table class="metric-table">
 
             <thead>
               <tr>
                 <th>Measure</th>
-                <th>Result</th>
+                <th>Count</th>
               </tr>
             </thead>
 
             <tbody>
 
               <tr>
-                <td>
-                  Held-out test rows
-                </td>
-
-                <td>
-                  <strong>6,163</strong>
-                </td>
+                <td>False positives</td>
+                <td><strong>800</strong></td>
               </tr>
 
               <tr>
-                <td>
-                  Held-out declining-proxy rows
-                </td>
-
-                <td>
-                  <strong>3,149</strong>
-                </td>
+                <td>False negatives</td>
+                <td><strong>811</strong></td>
               </tr>
 
               <tr>
-                <td>
-                  Held-out positive rate
-                </td>
-
-                <td>
-                  <strong>51.10%</strong>
-                </td>
+                <td>Total classification errors</td>
+                <td><strong>1,611</strong></td>
               </tr>
 
               <tr>
-                <td>
-                  False positives
-                </td>
-
-                <td>
-                  <strong>800</strong>
-                </td>
-              </tr>
-
-              <tr>
-                <td>
-                  False negatives
-                </td>
-
-                <td>
-                  <strong>811</strong>
-                </td>
-              </tr>
-
-              <tr>
-                <td>
-                  Total classification errors
-                </td>
-
-                <td>
-                  <strong>1,611</strong>
-                </td>
-              </tr>
-
-              <tr>
-                <td>
-                  Classification error rate
-                </td>
-
-                <td>
-                  <strong>26.14%</strong>
-                </td>
+                <td>Held-out rows</td>
+                <td><strong>6,163</strong></td>
               </tr>
 
             </tbody>
@@ -1199,18 +1140,17 @@
           </table>
 
 
-          <div class="callout warning">
+          <h3>4.2.1 Error analysis</h3>
 
-            <strong>Important metric distinction</strong>
-
-            The <strong>1.00 Precision@50</strong> result does not mean the
-            model achieved 100% overall classification accuracy.
-            The full held-out evaluation contained
-            <strong>1,611 classification errors</strong>, including
-            <strong>800 false positives</strong> and
-            <strong>811 false negatives</strong>.
-
-          </div>
+          <p>
+            The <strong>800 false positives</strong> represent pages the model
+            classified toward the declining class that did not have the
+            observed decline proxy, while the <strong>811 false negatives</strong>
+            represent proxy-declining pages that were missed by the
+            classification decision. These errors reinforce that the ranking
+            is a prioritization aid rather than a final decision rule and that
+            human review remains necessary.
+          </p>
 
 
           <h3>4.3 Model interpretation</h3>
@@ -1230,7 +1170,6 @@
             <li>Freshness.</li>
           </ul>
 
-
           <div class="callout warning">
 
             <strong>Interpret coefficients as associations.</strong>
@@ -1249,43 +1188,16 @@
             <strong>Do not interpret 1.00 as 100% accuracy.</strong>
 
             Logistic Regression placed 50 rows in its top-ranked 50 and all
-            50 had the proxy label
-            <code>trend_direction == "down"</code>
+            50 had the proxy label <code>trend_direction == "down"</code>
             on this particular held-out ranking.
 
             It does <strong>not</strong> mean that every test row was correctly
             classified.
 
-            The full held-out test set had a
-            <strong>26.14% classification error rate</strong>.
-
             It also does <strong>not</strong> mean that refreshing those pages
             will improve their future performance.
 
           </div>
-
-
-          <h3>4.5 Evidence-based interpretation</h3>
-
-          <p>
-            On this particular client-held-out evaluation, Logistic Regression
-            produced a measured <strong>Precision@50 of 1.00</strong>,
-            compared with <strong>0.66</strong> for the Visibility + CTR
-            baseline.
-          </p>
-
-          <p>
-            This means that all 50 pages selected at the top of the model's
-            ranking matched the observed decline proxy in this evaluation,
-            while 33 of the baseline's top 50 pages matched the same proxy.
-          </p>
-
-          <p>
-            The result supports using the model as a
-            <strong>review-prioritization signal for further testing</strong>.
-            It does not establish universal performance, causal impact,
-            automatic refresh decisions, or guaranteed future SEO improvement.
-          </p>
 
         </div>
       </article>
@@ -1554,6 +1466,27 @@
           </table>
 
 
+          <h3>Fresh-clone reproduction</h3>
+
+          <div class="code-box">
+git clone https://github.com/Maryam271/flyrank-ml-internship.git
+cd flyrank-ml-internship
+
+# Open the committed capstone notebook in Colab:
+work/notebooks/capstone.ipynb
+
+# In Colab:
+Runtime → Run all
+          </div>
+
+          <p>
+            The completed notebook records the evaluation configuration,
+            including <strong>random state 42</strong> and the client-grouped
+            holdout. Re-run the committed notebook from top to bottom to
+            reproduce the analysis and its saved outputs.
+          </p>
+
+
           <h3>Reproducibility checklist</h3>
 
           <ul class="check-list">
@@ -1601,50 +1534,49 @@ work/outputs/capstone_precision_at_50.png
 
           <p class="caption">
             The deployment copy of this chart is stored under
-            <code>docs/paper-examples/assets/</code>.
+            <code>docs/paper/assets/</code>.
           </p>
 
 
           <h3>Repository and notebook links</h3>
 
           <p>
-            Replace the placeholders below with your final public repository
-            and notebook URLs after deployment.
+            The committed project and capstone notebook are available here:
           </p>
 
           <ul>
-  <li>
-    <strong>Source repository:</strong>
-    <a
-      href="https://github.com/Maryam271/flyrank-ml-internship"
-      target="_blank"
-      rel="noopener noreferrer">
-      FlyRank ML Research Repository
-    </a>
-  </li>
 
-  <li>
-    <strong>Capstone notebook:</strong>
-    <a
-      href="https://colab.research.google.com/github/Maryam271/flyrank-ml-internship/blob/main/work/notebooks/capstone.ipynb?flush_cache=true"
-      target="_blank"
-      rel="noopener noreferrer">
-       Capstone Research Notebook
-    </a>
-  </li>
+            <li>
+              <strong>Source repository:</strong>
+              <a
+                href="https://github.com/Maryam271/flyrank-ml-internship"
+                target="_blank"
+                rel="noopener noreferrer">
+                FlyRank ML Research Repository
+              </a>
+            </li>
 
-</ul>
+            <li>
+              <strong>Capstone notebook:</strong>
+              <a
+                href="https://colab.research.google.com/github/Maryam271/flyrank-ml-internship/blob/main/work/notebooks/capstone.ipynb"
+                target="_blank"
+                rel="noopener noreferrer">
+                Capstone Research Notebook
+              </a>
+            </li>
 
-          <div class="callout warning">
+            <li>
+              <strong>Metric artifact:</strong>
+              <a
+                href="assets/capstone_precision_at_50.png"
+                target="_blank"
+                rel="noopener noreferrer">
+                Precision@50 comparison chart
+              </a>
+            </li>
 
-            <strong>Deployment reminder</strong>
-
-            The final repository should contain the notebooks and committed
-            outputs required by the internship submission. The root-level
-            <code>submission/paper_url.txt</code> should contain exactly one
-            line: the direct public URL of this research paper.
-
-          </div>
+          </ul>
 
         </div>
       </article>
@@ -1661,14 +1593,10 @@ work/outputs/capstone_precision_at_50.png
             Data credit
           </h2>
 
-              <p>
-             Built on the
-      <strong>
-       <a href="https://flyrank.ai" target="_blank" rel="noopener noreferrer">
-        FlyRank ML Internship dataset
-       </a>
-       </strong>.
-        </p>
+          <p>
+            Built on the
+            <strong>FlyRank ML Internship dataset</strong>.
+          </p>
 
           <p>
             This project was completed as part of the FlyRank AI ML
@@ -1704,7 +1632,7 @@ work/outputs/capstone_precision_at_50.png
       <article class="paper-card">
         <div class="paper-card-inner">
 
-          <div class="section-label"> References & Method Notes</div>
+          <div class="section-label">9 · References & Method Notes</div>
 
           <h2>
             Supporting methodological references
@@ -1738,17 +1666,6 @@ work/outputs/capstone_precision_at_50.png
             </li>
 
           </ul>
-
-          <div class="callout warning">
-
-            <strong>Important scope note</strong>
-
-            This page is a research-oriented internship capstone report, not
-            a peer-reviewed scientific publication. The evaluation should be
-            interpreted within the dataset, target definition, client split,
-            and time period described above.
-
-          </div>
 
         </div>
       </article>
@@ -1938,8 +1855,8 @@ work/outputs/capstone_precision_at_50.png
           <h3>What the result actually tells us</h3>
 
           <p>
-            The model ranked the top 50 held-out rows extremely well against
-            the observed decline proxy in this evaluation.
+            The model achieved 1.00 Precision@50 on the top 50 held-out
+            rows against the observed decline proxy.
           </p>
 
           <p>
@@ -2240,4 +2157,3 @@ content-refresh system.
 
 </body>
 </html>
-
