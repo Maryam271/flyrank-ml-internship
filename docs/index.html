@@ -862,10 +862,21 @@
           <p>
             The final candidate feature frame contained <strong>40 observable
             features</strong>: <strong>29 numeric</strong> and
-            <strong>11 categorical</strong>. The exact feature list is defined
-            in the committed capstone notebook. Target-derived fields and
-            identifiers were excluded before modeling.
+            <strong>11 categorical</strong>.
           </p>
+
+          <div class="callout warning">
+
+            <strong>Exact feature list</strong>
+
+            The committed capstone notebook records the 40-feature count
+            (29 numeric and 11 categorical), but the current notebook does
+            <strong>not</strong> contain the actual 40 feature names or the
+            production feature-selection code needed to reproduce that list.
+            The exact feature names therefore must be taken from the committed
+            ML modeling code rather than inferred or reconstructed here.
+
+          </div>
 
           <p>
             Specifically excluded were:
@@ -1110,6 +1121,7 @@
               <tr>
                 <th>Measure</th>
                 <th>Count</th>
+                <th>Operational meaning</th>
               </tr>
             </thead>
 
@@ -1118,21 +1130,38 @@
               <tr>
                 <td>False positives</td>
                 <td><strong>800</strong></td>
+                <td>
+                  Pages entering the review queue even though they did not
+                  match the observed decline proxy; the practical cost is
+                  reviewer time and queue capacity spent investigating pages
+                  that may not require attention.
+                </td>
               </tr>
 
               <tr>
                 <td>False negatives</td>
                 <td><strong>811</strong></td>
+                <td>
+                  Proxy-declining pages missed by the classification decision;
+                  the practical cost is potentially delayed investigation or
+                  missed review opportunities.
+                </td>
               </tr>
 
               <tr>
                 <td>Total classification errors</td>
                 <td><strong>1,611</strong></td>
+                <td>
+                  Combined false-positive and false-negative decisions.
+                </td>
               </tr>
 
               <tr>
                 <td>Held-out rows</td>
                 <td><strong>6,163</strong></td>
+                <td>
+                  Full client-held-out evaluation population.
+                </td>
               </tr>
 
             </tbody>
@@ -1147,9 +1176,23 @@
             classified toward the declining class that did not have the
             observed decline proxy, while the <strong>811 false negatives</strong>
             represent proxy-declining pages that were missed by the
-            classification decision. These errors reinforce that the ranking
-            is a prioritization aid rather than a final decision rule and that
-            human review remains necessary.
+            classification decision.
+          </p>
+
+          <p>
+            Operationally, false positives consume limited human review
+            capacity, while false negatives can leave a proxy-declining page
+            lower in the review queue and potentially delay investigation.
+            These costs matter because the model is being used to allocate
+            attention rather than to make an automatic content decision.
+          </p>
+
+          <p>
+            The current committed capstone evidence reports the aggregate
+            false-positive and false-negative counts, but it does not establish
+            a reliable qualitative error pattern by feature, client, or other
+            slice. No stronger qualitative pattern is claimed here without a
+            verified slice-level analysis.
           </p>
 
 
@@ -1442,6 +1485,16 @@
               </tr>
 
               <tr>
+                <td>Test size</td>
+                <td>0.20</td>
+              </tr>
+
+              <tr>
+                <td>Random state</td>
+                <td>42</td>
+              </tr>
+
+              <tr>
                 <td>Training rows</td>
                 <td>23,837</td>
               </tr>
@@ -1459,6 +1512,11 @@
               <tr>
                 <td>Held-out clients</td>
                 <td>7</td>
+              </tr>
+
+              <tr>
+                <td>Client overlap</td>
+                <td>0</td>
               </tr>
 
             </tbody>
@@ -1480,11 +1538,27 @@ Runtime → Run all
           </div>
 
           <p>
-            The completed notebook records the evaluation configuration,
-            including <strong>random state 42</strong> and the client-grouped
-            holdout. Re-run the committed notebook from top to bottom to
-            reproduce the analysis and its saved outputs.
+            The committed capstone notebook explicitly records
+            <strong>random state 42</strong>, a
+            <strong>GroupShuffleSplit by client_id</strong>, a 20% test-size
+            configuration, 25 training clients, 7 held-out clients, and zero
+            client overlap. :contentReference[oaicite:2]{index=2}
           </p>
+
+          <div class="callout warning">
+
+            <strong>Reproducibility artifact status</strong>
+
+            The current committed capstone notebook does not contain a
+            dependency/environment capture such as <code>requirements.txt</code>
+            or <code>pip freeze</code>, and it does not contain a separately
+            committed sealed-frame builder or metrics file. Therefore this
+            paper does not claim those artifacts exist.
+
+            The notebook does contain the evaluation configuration and the
+            verified metric values used in this paper.
+
+          </div>
 
 
           <h3>Reproducibility checklist</h3>
